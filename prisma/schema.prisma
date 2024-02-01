@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+  id String @id @default(cuid())
+  nama String @db.VarChar(200)
+  email String @unique
+  no_sk String @db.VarChar(200)
+  file_sk String?
+  password String
+  foto_profile String?
+  no_telp String @db.VarChar(14)
+  alamat String?
+  setuju Setuju 
+  isVerifikasi Verifikasi?
+  isRole Role
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  transaksi       Transaksi[]
+  histori_login   histori_login[]
+}
+
+enum Setuju {
+  YA
+  TIDAK
+}
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Verifikasi{
+  terVerifikasi
+  belumVerifikasi
+}
+
+model Transaksi {
+  id               Int      @id @default(autoincrement())
+  TglReg           DateTime
+  TglNaskah        DateTime
+  Hal              String @db.VarChar(200)
+  nama_instansi    String @db.VarChar(200)
+  file_surat       String
+  file_surat_name  String
+  tgl_verifikasi   DateTime?
+  nama_kegiatan String @db.VarChar(255)
+  start_kegiatan DateTime
+  end_kegiatan     DateTime
+  jumlah_peserta Int
+  tempat String 
+  isStatus Status
+  keterangan String?
+  file_laporan String?
+  balasan_surat Balasan
+  file_balasan String?
+  // Hubungan ke model user
+  user             User     @relation(fields: [id_user], references: [id])
+  id_user          String      // Foreign key ke model user
+}
+
+enum Status {
+  Selesai
+  Proses
+}
+
+enum Balasan {
+  sudahBalas
+  belumBalas
+}
+
+
+model histori_login {
+  id             Int      @id @default(autoincrement())
+  id_user        String      // Foreign key ke model user
+  nama_instansi  String
+  tgl_login      DateTime
+  // Hubungan ke model user
+  user           User     @relation(fields: [id_user], references: [id])
+}
